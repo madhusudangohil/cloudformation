@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A hello world application.
+Resources:
+  HelloWorldFunction:
+    FunctionName:
+    - ch2-sms-sam-test
+    Properties:
+      Code:
+        S3Bucket: ch2-sms-sam-test
+        S3Key: adcc695df6cb1898a7b5252d7cbd2e9d
+      CodeUri: s3://ch2-sms-sam-test/index.zip
+      Handler: index.handler
+      Runtime: nodejs6.10
+    Type: AWS::Lambda::Function
+Transform: AWS::Serverless-2016-10-31

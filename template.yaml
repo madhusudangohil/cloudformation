@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion : '2010-09-09' 
+Description: A hello world application. 
+Parameters:
+  CreateSnsTopic:
+    Description: Whether I should create a resource.
+    Default: false
+    Type: String
+    AllowedValues: [true, false]
+Conditions:
+   CreateTopicResource: 
+     !Equals [true, !Ref CreateSnsTopic]
+Resources: 
+   HelloWorldFunction: 
+     Type: AWS::Lambda::Function    
+     Properties:       
+       Handler: index.handler 
+       Runtime: nodejs6.10 
+       Code: 
+         S3Bucket: ch2-sms-sam-test
+         S3Key: index.zip 
+       FunctionName: ch2-sms-sam-test
+       Role: arn:aws:iam::300813158921:role/ch2-sms-lambda-role
+   HelloWorldTopic:
+     Type: AWS::SNS::Topic
+     Condition: CreateTopicResource
+     Properties: 
+      DisplayName: ch2-sms-test
+      TopicName: ch2-sms-test
+   HelloWorldSubscription:
+     Type: AWS::SNS::Subscription
+     Properties: 
+       Endpoint: arn:aws:lambda:us-west-2:300813158921:function:ch2-sms-sam-test
+       Protocol: lambda
+       TopicArn: arn:aws:sns:us-west-2:300813158921:ch2-sms-test
+   HelloWorldPermission:
+     Type: AWS::Lambda::Permission
+     Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - HelloWorldFunction
+        - Arn
+      Action: lambda:InvokeFunction
+      SourceArn: !If [CreateTopicResource, !Ref HelloWorldTopic, 'arn:aws:sns:us-west-2:300813158921:ch2-sms-test']        
+      Principal: sns.amazonaws.com
+     DependsOn:
+       - HelloWorldFunction       

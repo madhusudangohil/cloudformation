@@ -1,0 +1,13 @@
+Parameters:
+  CreateResource:
+    Description: Whether I should create a resource.
+    Default: false
+    Type: String
+    AllowedValues: [true, false]
+Conditions:
+  ShouldCreateResource:
+    !Equals [true, !Ref CreateResource]
+Resources:
+  Resource:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: ShouldCreateResource
